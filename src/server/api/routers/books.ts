@@ -79,10 +79,12 @@ export const booksRouter = createTRPCRouter({
   saveBook: protectedProcedure
     .input(createBookInputSchema)
     .mutation(async ({ input, ctx }) => {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "Please sign in to save books.",
-      });
+      if (!ctx.session.user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Please sign in to save books.",
+        });
+      }
       const data: Prisma.BookCreateInput = {
         id: input.id,
         title: input.title,
